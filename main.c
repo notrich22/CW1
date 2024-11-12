@@ -1,10 +1,11 @@
 #include <ctype.h>
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #define variant "5.16"
 #define author "Aleksandr Vasilev"
-
+//#define DEBUG 
 struct Sentence{
     char* content;
     size_t length;
@@ -20,7 +21,8 @@ struct Sentence create_sentence(char *start, int length) {
 
 struct Sentence lower(struct Sentence sntnc){
     struct Sentence lower;
-    for(int i = 0; i < sntnc.length; i++){
+    lower.content =  (char*)calloc(strlen(sntnc.content),sizeof(char*));
+    for(int i = 0; i < strlen(sntnc.content); i++){
         lower.content[i] = tolower(sntnc.content[i]);
     }
     return lower;
@@ -33,35 +35,43 @@ struct Text{
 
 struct Text string_handling(char* s, size_t length){
     struct Text text;
+    text.sentences_count = 0;
     char *start_pointer = s;
     char *end_pointer = s;
 
     //Memory allocation for Text.Sentences
-    
     while(*start_pointer != '\0'){
         if(*start_pointer == '.'){
             text.sentences_count += 1;
         }
         start_pointer++;
     }
-    text.sentences = (struct Sentence*) calloc(text.sentences_count,sizeof(struct Sentence*));
+    text.sentences = (struct Sentence*) calloc(text.sentences_count,sizeof(struct Sentence));
     
     //String handling part
     start_pointer = s;
     int i = 0;
     for (int j = 0; j < length; j++) {
         if (s[j] == '.') {
+            // Пропуск пробела после точки
+            if (s[j + 1] == ' ') {
+                j++;  // Сдвигаем индекс, чтобы пропустить пробел
+            }
             text.sentences[i++] = create_sentence(start_pointer, j - (start_pointer - s) + 1);
             start_pointer = s + j + 1;
         }
     }
 
     // Удаление дубликатов
-    for (int i = 0; i < text.sentences_count; i++) {
+    /*for (int i = 0; i < text.sentences_count; i++) {
         for (int j = i + 1; j < text.sentences_count; j++) {
             if (text.sentences[j].content != NULL && text.sentences[i].content != NULL) {
                 char *lower_i = lower(text.sentences[i]).content;
                 char *lower_j = lower(text.sentences[j]).content;
+                #ifdef DEBUG
+                printf("%s",lower_i);
+                printf("%s",lower_j);
+                #endif
                 if (strcmp(lower_i, lower_j) == 0) {
                     free(text.sentences[j].content); // Освобождаем память
                     text.sentences[j].content = NULL; // Помечаем как удалённую
@@ -70,15 +80,15 @@ struct Text string_handling(char* s, size_t length){
                 free(lower_j);
             }
         }
-    }
-
+    }*/
+/*
     // Перенос уникальных предложений в новый массив
     int unique_count = 0;
     for (int i = 0; i < text.sentences_count; i++) {
         if (text.sentences[i].content != NULL) {
             text.sentences[unique_count++] = text.sentences[i];
         }
-    }
+    }*/
     return text;
 }
 struct Text get_text() {
@@ -115,6 +125,7 @@ void print_text(struct Text text) {
 
 
 int main(){
+    setlocale(LC_ALL, ""); // Устанавливаем локаль для поддержки UTF-8
     //Greeting
     printf("Course work for option %s, created by %s.\n", variant, author);
     //Пока вот на таком варианте остановимся
@@ -146,9 +157,6 @@ int main(){
             printf("Error: Данные некорректны\n");
             main();
             break;
-    }
-    for (int i = 0; i < s.sentences_count; i++) {
-        free(s.sentences[i].content);
     }
     free(s.sentences);
     return 0;
