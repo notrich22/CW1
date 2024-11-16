@@ -6,10 +6,13 @@
 #define variant "5.16"
 #define author "Aleksandr Vasilev"
 #define DEBUG 
+
+
 struct Sentence{
     char* content;
     size_t length;
 };
+
 
 struct Sentence create_sentence(char *start, int length) {
     struct Sentence sentence;
@@ -18,6 +21,7 @@ struct Sentence create_sentence(char *start, int length) {
     sentence.content[length] = '\0'; // Добавляем завершающий нуль
     return sentence;
 }
+
 
 struct Sentence lower(struct Sentence sntnc){
     struct Sentence lower;
@@ -28,10 +32,12 @@ struct Sentence lower(struct Sentence sntnc){
     return lower;
 }
 
+
 struct Text{
     struct Sentence* sentences;
     size_t sentences_count;
 };
+
 
 struct Text string_handling(char* s, size_t length){
     struct Text text;
@@ -202,6 +208,42 @@ struct Text modify_words_ending_with_digit(struct Text text) {
     return text;
 }
 
+// Функция для подсчета количества слов в строке
+int count_words(const char* str) {
+    int count = 0;
+    int in_word = 0;
+
+    while (*str) {
+        if (isspace((unsigned char)*str)) {
+            in_word = 0;
+        } else if (!in_word) {
+            in_word = 1;
+            count++;
+        }
+        str++;
+    }
+
+    return count;
+}
+
+// Функция сравнения для qsort
+int compare_sentences(const void* a, const void* b) {
+    struct Sentence* sentence_a = (struct Sentence*)a;
+    struct Sentence* sentence_b = (struct Sentence*)b;
+
+    int count_a = count_words(sentence_a->content);
+    int count_b = count_words(sentence_b->content);
+
+    // Для сортировки по убыванию (обратный порядок)
+    return count_b - count_a;
+}
+
+// Функция для сортировки предложений в структуре Text
+struct Text sort_sentences_by_word_count(struct Text text) {
+    qsort(text.sentences, text.sentences_count, sizeof(struct Sentence), compare_sentences);
+    return text;
+}
+
 void print_text(struct Text text) {
     for (int i = 0; i < text.sentences_count; i++) {
         if (text.sentences[i].content != NULL) {
@@ -210,10 +252,12 @@ void print_text(struct Text text) {
     }
 }
 
+
 void print_help(){
     printf("1) Изменить все слова в тексте заканчивающиеся на символ цифры (0-9) так чтобы они заканчивались на название цифры на кириллице\n2) Вывести все предложения в которых встречается последнее слово предыдущего предложения.\n3) Отсортировать предложения по уменьшению количества слов в предложении.\n4) Удалить все предложения в которых два и меньше слова.\n5) Вызов справки\n");
     return;
 }   
+
 
 int main(){
     setlocale(LC_ALL, ""); // Устанавливаем локаль для поддержки UTF-8
@@ -245,6 +289,8 @@ int main(){
             break;
         case 3:
             s = get_text();
+            sort_sentences_by_word_count(s);
+            print_text(s);
             break;
         case 4:
             s = get_text();
