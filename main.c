@@ -117,22 +117,89 @@ struct Text get_text() {
 
     int len = 0;
     int capacity = 1;
-    //Memory allocation for input string part
-    char *s = (char*) malloc(sizeof(char));
+    // Memory allocation for input string
+    char *s = (char*) malloc(capacity * sizeof(char));
+    if (!s) {
+        fprintf(stderr, "Ошибка выделения памяти\n");
+        exit(1);
+    }
 
-    char c = getchar();
-
-    while (c != '\n') {
+    char c;
+    while ((c = getchar()) != '\n' && c != EOF) {
         s[len++] = c;
         if (len >= capacity) {
             capacity *= 2;
             s = (char *)realloc(s, capacity * sizeof(char));
-        }   
-        c = getchar();
+            if (!s) {
+                fprintf(stderr, "Ошибка выделения памяти\n");
+                exit(1);
+            }
+        }
     }
     s[len] = '\0';
 
     return string_handling(s, len);
+}
+
+
+const char* digit_to_cyrillic_name(char digit) {
+    switch (digit) {
+        case '0': return "ноль";
+        case '1': return "один";
+        case '2': return "два";
+        case '3': return "три";
+        case '4': return "четыре";
+        case '5': return "пять";
+        case '6': return "шесть";
+        case '7': return "семь";
+        case '8': return "восемь";
+        case '9': return "девять";
+        default: return "";
+    }
+}
+
+
+struct Text modify_words_ending_with_digit(struct Text text) {
+    for (int i = 0; i < text.sentences_count; i++) {
+        char* sentence = text.sentences[i].content;
+        size_t len = strlen(sentence);
+        char* new_sentence = (char*)malloc(len * 4); // Резервируем достаточно места для возможных изменений
+        if (!new_sentence) continue; // Проверка на успешное выделение памяти
+
+        char* word_start = sentence;
+        char* new_sentence_ptr = new_sentence;
+
+        for (size_t j = 0; j <= len; j++) {
+            if (isspace(sentence[j]) || sentence[j] == '\0' || ispunct(sentence[j])) {
+                // Найдено слово
+                size_t word_length = &sentence[j] - word_start;
+                if (word_length > 0) {
+                    // Проверяем, оканчивается ли слово на цифру
+                    if (isdigit(word_start[word_length - 1])) {
+                        char digit = word_start[word_length - 1];
+                        strncpy(new_sentence_ptr, word_start, word_length - 1); // Копируем часть слова без последней цифры
+                        new_sentence_ptr += word_length - 1;
+                        const char* digit_name = digit_to_cyrillic_name(digit); // Получаем название цифры
+                        strcpy(new_sentence_ptr, digit_name); // Копируем название цифры
+                        new_sentence_ptr += strlen(digit_name);
+                    } else {
+                        strncpy(new_sentence_ptr, word_start, word_length); // Копируем слово целиком
+                        new_sentence_ptr += word_length;
+                    }
+                }
+                // Копируем символ-разделитель (если не конец строки)
+                if (sentence[j] != '\0') {
+                    *new_sentence_ptr++ = sentence[j];
+                }
+                // Обновляем начало следующего слова
+                word_start = &sentence[j + 1];
+            }
+        }
+        *new_sentence_ptr = '\0'; // Завершаем строку
+        free(text.sentences[i].content); // Освобождаем старое содержимое
+        text.sentences[i].content = new_sentence; // Обновляем содержимое
+    }
+    return text;
 }
 
 void print_text(struct Text text) {
@@ -142,7 +209,6 @@ void print_text(struct Text text) {
         }
     }
 }
-
 
 void print_help(){
     printf("1) Изменить все слова в тексте заканчивающиеся на символ цифры (0-9) так чтобы они заканчивались на название цифры на кириллице\n2) Вывести все предложения в которых встречается последнее слово предыдущего предложения.\n3) Отсортировать предложения по уменьшению количества слов в предложении.\n4) Удалить все предложения в которых два и меньше слова.\n5) Вызов справки\n");
@@ -159,6 +225,10 @@ int main(){
     //Selection
     int selection;
     scanf("%d", &selection);
+    // Цикл для очистки буфера после считывания числа
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+
     struct Text s;
     switch (selection) {
         case 0:
@@ -167,7 +237,8 @@ int main(){
             break;
         case 1:
             s = get_text();
-
+            s = modify_words_ending_with_digit(s);
+            print_text(s);
             break;
         case 2:
             s = get_text();
