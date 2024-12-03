@@ -1,31 +1,5 @@
 #include "text.h"
-#include "input_and_output_processing.c"
 
-
-struct Text get_text() {
-    struct Text text;
-    int len = 0, capacity = 1;
-    wchar_t* s = (wchar_t*)malloc(capacity * sizeof(wchar_t));
-    assert(s != NULL);
-    wchar_t c;
-    while ((c = getwchar()) != L'\n' && c != WEOF) {
-        s[len++] = c;
-        if (len >= capacity) {
-            capacity *= 2;
-            wchar_t* temp = realloc(s, capacity * sizeof(wchar_t));
-            if (!temp) {
-                free(s);
-                fwprintf(stderr, L"Ошибка выделения памяти\n");
-                exit(1);
-            }
-            s = temp;
-        }
-    }
-    s[len] = L'\0';
-    text = string_handling(s, len);
-    free(s);
-    return text;
-}
 
 const wchar_t* digit_to_cyrillic_name(wchar_t digit) {
     switch (digit) {

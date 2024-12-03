@@ -13,8 +13,7 @@ struct Text {
 };
 
 
-// Получение текста от пользователя
-struct Text get_text();
+
 // Преобразование цифры в слово на кириллице
 const wchar_t* digit_to_cyrillic_name(wchar_t digit);
 // Функция для изменения слов, оканчивающихся на цифры

@@ -1,4 +1,3 @@
-#include "sentence.h"
 #include "text.h"
 #include "ioprocessing.h"
 #include <locale.h>

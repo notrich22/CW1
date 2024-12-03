@@ -101,6 +101,32 @@ struct Text string_handling(wchar_t* s, size_t length) {
 }
 
 
+struct Text get_text() {
+    struct Text text;
+    int len = 0, capacity = 1;
+    wchar_t* s = (wchar_t*)malloc(capacity * sizeof(wchar_t));
+    assert(s != NULL);
+    wchar_t c;
+    while ((c = getwchar()) != L'\n' && c != WEOF) {
+        s[len++] = c;
+        if (len >= capacity) {
+            capacity *= 2;
+            wchar_t* temp = realloc(s, capacity * sizeof(wchar_t));
+            if (!temp) {
+                free(s);
+                fwprintf(stderr, L"Ошибка выделения памяти\n");
+                exit(1);
+            }
+            s = temp;
+        }
+    }
+    s[len] = L'\0';
+    text = string_handling(s, len);
+    free(s);
+    return text;
+}
+
+
 void highlight_word(const wchar_t* word) {
     wprintf(L"\033[31m\033[4m%ls\033[0m", word);
 }
