@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <stdlib.h>
 #include <wchar.h>
 #include "text.h"
@@ -17,7 +16,9 @@ wchar_t* find_last_word(struct Sentence sntnc) {
     }
     size_t length = end - start - 1;
     wchar_t* word = (wchar_t*)malloc((length + 1) * sizeof(wchar_t));
-    assert(word != NULL);
+    if(word == NULL){
+
+    }
     wcsncpy(word, start, length);
     word[length] = L'\0';
     return word;
@@ -39,7 +40,10 @@ struct Text string_handling(wchar_t* s, size_t length) {
 
     // Выделение памяти для предложений
     text.sentences = (struct Sentence*)calloc(text.sentences_count, sizeof(struct Sentence));
-    assert(text.sentences != NULL);
+    if (!text.sentences) {
+        wprintf(L"Ошибка выделения памяти\n");
+        exit(1);
+    }
     start_pointer = s;
     int i = 0;
 
@@ -86,7 +90,10 @@ struct Text string_handling(wchar_t* s, size_t length) {
 
     // Перенос уникальных предложений
     struct Sentence* unique_sentences = (struct Sentence*)calloc(unique_count, sizeof(struct Sentence));
-    assert(unique_sentences != NULL);
+    if (!unique_sentences) {
+        wprintf(L"Ошибка выделения памяти\n");
+        exit(1);
+    }
     int index = 0;
     for (int i = 0; i < text.sentences_count; i++) {
         if (text.sentences[i].content != NULL) {
@@ -105,7 +112,10 @@ struct Text get_text() {
     struct Text text;
     int len = 0, capacity = 1;
     wchar_t* s = (wchar_t*)malloc(capacity * sizeof(wchar_t));
-    assert(s != NULL);
+    if (!s) {
+        wprintf(L"Ошибка выделения памяти\n");
+        exit(1);
+    }
     wchar_t c;
     while ((c = getwchar()) != L'\n' && c != WEOF) {
         s[len++] = c;

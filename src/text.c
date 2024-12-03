@@ -23,7 +23,10 @@ struct Text modify_words_ending_with_digit(struct Text text) {
         wchar_t* sentence = text.sentences[i].content;
         size_t len = wcslen(sentence);
         wchar_t* new_sentence = (wchar_t*)malloc(len * 4 * sizeof(wchar_t));
-        assert(new_sentence != NULL);
+        if (!new_sentence) {
+        wprintf(L"Ошибка выделения памяти\n");
+        exit(1);
+        }
 
         wchar_t* word_start = sentence;
         wchar_t* new_sentence_ptr = new_sentence;
@@ -71,7 +74,10 @@ struct Text remove_sentences_with_two_or_fewer_words(struct Text text) {
     }
 
     struct Sentence* new_sentences = (struct Sentence*)malloc(new_count * sizeof(struct Sentence));
-    assert(new_sentences != NULL);
+    if (!new_sentences) {
+        wprintf(L"Ошибка выделения памяти\n");
+        exit(1);
+    }
     int index = 0;
     for (int i = 0; i < text.sentences_count; i++) {
         if (count_words(text.sentences[i]) > 2) {

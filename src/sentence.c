@@ -4,7 +4,10 @@
 struct Sentence create_sentence(wchar_t* start, int length) {
     struct Sentence sentence;
     sentence.content = (wchar_t*)malloc((length + 1) * sizeof(wchar_t));
-    assert(sentence.content != NULL);
+    if (!sentence.content) {
+        wprintf(L"Ошибка выделения памяти\n");
+        exit(1);
+    }
     wcsncpy(sentence.content, start, length);
     sentence.content[length] = L'\0';
     return sentence;
@@ -15,7 +18,10 @@ struct Sentence lower(struct Sentence sntnc) {
     struct Sentence lower;
     size_t len = wcslen(sntnc.content);
     lower.content = (wchar_t*)calloc(len + 1, sizeof(wchar_t));
-    assert(lower.content != NULL);
+    if (!lower.content) {
+        wprintf(L"Ошибка выделения памяти\n");
+        exit(1);
+    }
     for (size_t i = 0; i < len; i++) {
         lower.content[i] = towlower(sntnc.content[i]);
     }

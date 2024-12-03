@@ -1,6 +1,5 @@
 #pragma once
 #include <stdlib.h>
-#include <assert.h>
 #include <wchar.h>
 #include <wctype.h>
 
