@@ -41,7 +41,7 @@ struct Text string_handling(wchar_t* s, size_t length) {
     // Выделение памяти для предложений
     text.sentences = (struct Sentence*)calloc(text.sentences_count, sizeof(struct Sentence));
     if (!text.sentences) {
-        wprintf(L"Ошибка выделения памяти\n");
+        wprintf(L"Error: не удалось выделить память\n");
         exit(1);
     }
     start_pointer = s;
@@ -91,7 +91,7 @@ struct Text string_handling(wchar_t* s, size_t length) {
     // Перенос уникальных предложений
     struct Sentence* unique_sentences = (struct Sentence*)calloc(unique_count, sizeof(struct Sentence));
     if (!unique_sentences) {
-        wprintf(L"Ошибка выделения памяти\n");
+        wprintf(L"Error: не удалось выделить память\n");
         exit(1);
     }
     int index = 0;
@@ -113,7 +113,7 @@ struct Text get_text() {
     int len = 0, capacity = 1;
     wchar_t* s = (wchar_t*)malloc(capacity * sizeof(wchar_t));
     if (!s) {
-        wprintf(L"Ошибка выделения памяти\n");
+        wprintf(L"Error: не удалось выделить память\n");
         exit(1);
     }
     wchar_t c;

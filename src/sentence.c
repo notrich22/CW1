@@ -5,7 +5,7 @@ struct Sentence create_sentence(wchar_t* start, int length) {
     struct Sentence sentence;
     sentence.content = (wchar_t*)malloc((length + 1) * sizeof(wchar_t));
     if (!sentence.content) {
-        wprintf(L"Ошибка выделения памяти\n");
+        wprintf(L"Error: не удалось выделить память\n");
         exit(1);
     }
     wcsncpy(sentence.content, start, length);
@@ -19,7 +19,7 @@ struct Sentence lower(struct Sentence sntnc) {
     size_t len = wcslen(sntnc.content);
     lower.content = (wchar_t*)calloc(len + 1, sizeof(wchar_t));
     if (!lower.content) {
-        wprintf(L"Ошибка выделения памяти\n");
+        wprintf(L"Error: не удалось выделить память\n");
         exit(1);
     }
     for (size_t i = 0; i < len; i++) {
@@ -51,4 +51,11 @@ int count_words(struct Sentence sentence) {
         str++;
     }
     return count;
+}
+
+void free_sentence(struct Sentence* sentence) {
+    if (sentence->content != NULL) {
+        free(sentence->content);
+        sentence->content = NULL;
+    }
 }

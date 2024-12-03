@@ -24,7 +24,7 @@ struct Text modify_words_ending_with_digit(struct Text text) {
         size_t len = wcslen(sentence);
         wchar_t* new_sentence = (wchar_t*)malloc(len * 4 * sizeof(wchar_t));
         if (!new_sentence) {
-        wprintf(L"Ошибка выделения памяти\n");
+        wprintf(L"Error: не удалось выделить память\n");
         exit(1);
         }
 
@@ -75,7 +75,7 @@ struct Text remove_sentences_with_two_or_fewer_words(struct Text text) {
 
     struct Sentence* new_sentences = (struct Sentence*)malloc(new_count * sizeof(struct Sentence));
     if (!new_sentences) {
-        wprintf(L"Ошибка выделения памяти\n");
+        wprintf(L"Error: не удалось выделить память\n");
         exit(1);
     }
     int index = 0;
@@ -90,4 +90,15 @@ struct Text remove_sentences_with_two_or_fewer_words(struct Text text) {
     text.sentences = new_sentences;
     text.sentences_count = new_count;
     return text;
+}
+
+
+void free_text(struct Text* text) {
+    if (text->sentences != NULL) {
+        for (size_t i = 0; i < text->sentences_count; i++) {
+            free_sentence(&text->sentences[i]);
+        }
+        free(text->sentences);
+        text->sentences = NULL;
+    }
 }

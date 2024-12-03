@@ -3,7 +3,7 @@
 #include <wchar.h>
 #include <wctype.h>
 
-
+// Объявление структуры Sentence
 struct Sentence {
     wchar_t* content;
     size_t length;
@@ -18,3 +18,5 @@ struct Sentence lower(struct Sentence sntnc);
 int compare_sentences(const void* a, const void* b);
 // Подсчет слов в предложении
 int count_words(struct Sentence sentence);
+// Метод очищения памяти
+void free_sentence(struct Sentence* sentence);

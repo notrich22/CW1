@@ -6,7 +6,7 @@
 #include <wctype.h>
 
 
-//Объявление структуры Text
+// Объявление структуры Text
 struct Text {
     struct Sentence* sentences;
     size_t sentences_count;
@@ -22,5 +22,5 @@ struct Text modify_words_ending_with_digit(struct Text text);
 struct Text sort_sentences_by_word_count(struct Text text);
 // Удаление предложений с двумя и меньше словами
 struct Text remove_sentences_with_two_or_fewer_words(struct Text text);
-
-
+// Метод очищения памяти
+void free_text(struct Text* text);

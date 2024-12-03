@@ -14,43 +14,40 @@ int main() {
     int c;
     while ((c = getwchar()) != L'\n' && c != WEOF);
 
-    struct Text s;
+    struct Text text;
     switch (selection) {
         case 0://TESTED
-            s = get_text();
-            print_text(s);
+            text = get_text();
+            print_text(text);
             break;
         case 1://TESTED
-            s = get_text();
-            s = modify_words_ending_with_digit(s);
-            print_text(s);
+            text = get_text();
+            text = modify_words_ending_with_digit(text);
+            print_text(text);
             break;
         case 2://TESTED
-            s = get_text();
-            print_matching_sentences(s);
+            text = get_text();
+            print_matching_sentences(text);
             break;
         case 3://BUGS COULD BE
-            s = get_text();
-            s = sort_sentences_by_word_count(s);
-            print_text(s);
+            text = get_text();
+            text = sort_sentences_by_word_count(text);
+            print_text(text);
             break;
-        case 4:
-            s = get_text();
-            s = remove_sentences_with_two_or_fewer_words(s);
-            print_text(s);
+        case 4://TESTED
+            text = get_text();
+            text = remove_sentences_with_two_or_fewer_words(text);
+            print_text(text);
             break;
-        case 5:
+        case 5://TESTED
             print_help();
             break;
         default:
-            wprintf(L"Ошибка: некорректный ввод\n");
+            wprintf(L"Error: некорректный ввод\n");
             break;
     }
-    if(s.sentences != NULL){
-        for (int i = 0; i < s.sentences_count; i++) {
-            free(s.sentences[i].content);
-        }
-        free(s.sentences);
+    if(text.sentences != NULL){
+        free_text(&text);
     }
     return 0;
 }
