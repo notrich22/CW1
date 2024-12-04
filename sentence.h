@@ -3,7 +3,7 @@
 #include <wchar.h>
 #include <wctype.h>
 
-// Объявление структуры Sentence
+// Класс описывающий предложение
 struct Sentence {
     wchar_t* content;
     size_t length;

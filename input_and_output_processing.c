@@ -117,7 +117,19 @@ struct Text get_text() {
         exit(1);
     }
     wchar_t c;
-    while ((c = getwchar()) != L'\n' && c != WEOF) {
+    int rbreak = 0;
+    while ((c = getwchar()) != WEOF) {
+        if(c == '\n'){
+            rbreak++;
+            if(rbreak == 2){
+                break;
+            }
+            continue;
+        }
+        if(rbreak != 0){
+            rbreak = 0;
+        }
+
         s[len++] = c;
         if (len >= capacity) {
             capacity *= 2;
@@ -153,24 +165,55 @@ void print_text(struct Text text) {
 
 void print_matching_sentences(struct Text text) {
     if (text.sentences_count <= 0) return;
+
+    // Получаем последнее слово последнего предложения
     wchar_t* last_word = find_last_word(text.sentences[text.sentences_count - 1]);
+    if (!last_word) return;
+
     for (int i = 0; i < text.sentences_count; i++) {
         wchar_t* current_last_word = last_word;
         if (i > 0) {
-            if(current_last_word != NULL)free(current_last_word);
+            //free(current_last_word);
             current_last_word = find_last_word(text.sentences[i - 1]);
+            if (!current_last_word) continue;
         }
+
         struct Sentence current_sentence = text.sentences[i];
-        const wchar_t* found = wcsstr(current_sentence.content, current_last_word);
-        if (found) {
-            size_t word_length = wcslen(current_last_word);
-            const wchar_t* ptr = current_sentence.content;
-            while (ptr < found) putwchar(*ptr++);
-            highlight_word(current_last_word);
-            ptr += word_length;
-            wprintf(L"%ls\n", ptr);
+
+        // Преобразуем предложение и искомое слово в нижний регистр для сравнения
+        size_t sentence_len = wcslen(current_sentence.content);
+        wchar_t* lower_sentence = calloc(sentence_len + 1, sizeof(wchar_t));
+        for (size_t j = 0; j < sentence_len; j++) {
+            lower_sentence[j] = towlower(current_sentence.content[j]);
         }
+
+        size_t word_len = wcslen(current_last_word);
+        wchar_t* lower_word = calloc(word_len + 1, sizeof(wchar_t));
+        for (size_t j = 0; j < word_len; j++) {
+            lower_word[j] = towlower(current_last_word[j]);
+        }
+
+        // Ищем слово в предложении без учёта регистра
+        wchar_t* found = wcsstr(lower_sentence, lower_word);
+        if (found) {
+            // Вычисляем смещение для оригинального предложения
+            size_t offset = found - lower_sentence;
+
+            // Выводим часть предложения до найденного слова
+            wprintf(L"%.*ls", (int)offset, current_sentence.content);
+
+            // Выделяем найденное слово, подчеркнув его красным цветом
+            wprintf(L"\033[4;31m%.*ls\033[0m", (int)word_len, current_sentence.content + offset);
+
+            // Выводим оставшуюся часть предложения
+            wprintf(L"%ls\n", current_sentence.content + offset + word_len);
+        }
+
+        // Освобождаем память
+        free(lower_sentence);
+        free(lower_word);
     }
+
     free(last_word);
 }
 

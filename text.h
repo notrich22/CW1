@@ -6,7 +6,7 @@
 #include <wctype.h>
 
 
-// Объявление структуры Text
+// Класс, описывающий текст
 struct Text {
     struct Sentence* sentences;
     size_t sentences_count;
